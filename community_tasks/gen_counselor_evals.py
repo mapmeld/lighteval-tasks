@@ -29,7 +29,7 @@ This file generally creates just a TASKS_TABLE and TASKS_GROUPS which are then i
 Source dataset: https://huggingface.co/datasets/monsoon-nlp/genetic-counselor-multiple-choice
 Questions combined from three Quizlets.
 
-In order to have comparable results to ours, please do not forget to run with --use_chat_template
+In order to have comparable results to ours, please do not forget to run with --use-chat-template
 """
 
 from lighteval.metrics.metrics import Metrics
@@ -37,7 +37,7 @@ from lighteval.tasks.lighteval_task import LightevalTaskConfig
 from lighteval.tasks.requests import Doc
 
 
-def prompt_fn_oz_eval_task(line, task_name: str = None):
+def prompt_fn_gc_eval_task(line, task_name: str = None):
     query_template = """Question: {question}\n
     Suggested answers:
     A. {choice_a}
@@ -47,8 +47,7 @@ def prompt_fn_oz_eval_task(line, task_name: str = None):
 
     Final answer:"""
 
-source,author,question,optionA,optionB,optionC,optionD,letter_answer
-
+    query = query_template.format(
         question=line["question"],
         choice_a=line["optionA"],
         choice_b=line["optionB"],
@@ -67,7 +66,7 @@ source,author,question,optionA,optionB,optionC,optionD,letter_answer
 
 gc_eval_task = LightevalTaskConfig(
     name="genetic-counselor-multiple-choice",
-    prompt_function=prompt_fn_oz_eval_task,
+    prompt_function=prompt_fn_gc_eval_task,
     suite=["gen-counselor"],
     hf_repo="monsoon-nlp/genetic-counselor-multiple-choice",
     hf_subset="default",
