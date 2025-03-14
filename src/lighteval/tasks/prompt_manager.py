@@ -30,7 +30,8 @@ from typing import TYPE_CHECKING, Optional, Tuple, Union
 
 from lighteval.models.abstract_model import LightevalModel
 from lighteval.models.litellm_model import LiteLLMClient
-from lighteval.tasks.requests import Doc, GreedyUntilRequest
+from lighteval.models.model_output import Batch
+from lighteval.tasks.requests import Doc
 from lighteval.utils.utils import as_list
 
 
@@ -241,13 +242,20 @@ class PromptManager:
             chat_preview = self.model.tokenizer.apply_chat_template(
                 output, tokenize=False, add_generation_prompt=True
             )
-            greedyRequest = GreedyUntilRequest(
-                stop_sequence=["</think>"],
-                generation_size=10,
-                tokenized_context=chat_preview
+            tokenized = self.model.tokenizer(chat_preview, return_tensors="pt").to(self.model.device)
+            prepared_batch = Batch(
+                input_ids=tokenized["input_ids"],
+                input_mask=tokenized["attention_mask"],
+                input_lengths=[len(tokenized["input_ids"][0])],
+                truncated=[False],
+                padded=[False],
             )
-            response = self.model.greedy_until([greedyRequest])
-            print(response[0].result)
+            response = self.model._generate(
+                batch=prepared_batch,
+                max_new_tokens=2048,
+                stop_tokens=["</think>"],
+            )
+            logger.info(response[0].result)
             return response[0].result, num_effective_fewshots
 
         return output, num_effective_fewshots
