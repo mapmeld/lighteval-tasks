@@ -60,7 +60,7 @@ def prompt_fn_gc_eval_task(line, task_name: str = None):
         task_name=task_name,
         query=query,
         choices=choices,
-        gold_index=choices.index(line["letter_answer"]),
+        gold_index=['A', 'B', 'C', 'D'].index(line["letter_answer"]),
     )
 
 

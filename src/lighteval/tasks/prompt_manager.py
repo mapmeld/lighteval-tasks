@@ -255,8 +255,9 @@ class PromptManager:
                 max_new_tokens=2048,
                 stop_tokens=["</think>"],
             )
-            logger.info(response[0].result)
-            return response[0].result, num_effective_fewshots
+            all_start = chat_preview + response[0].result[0] + "</think>"
+            logger.info(response[0].result[0])
+            return all_start, num_effective_fewshots
 
         return output, num_effective_fewshots
 
