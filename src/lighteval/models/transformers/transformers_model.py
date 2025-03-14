@@ -1055,6 +1055,17 @@ class TransformersModel(LightevalModel):
                 dataloader = self.accelerator.prepare(dataloader)
 
             for batch in tqdm(dataloader, disable=self.disable_tqdm):
+                filled_responses = self._generate(
+                    batch=batch,
+                    max_new_tokens=512,
+                    stop_tokens=["</think>"],
+                    num_samples=1,
+                    do_sample=False,
+                )
+                for idx, item in enumerate(batch):
+                    item.tokenized_context = filled_responses[idx]
+                    print(filled_responses[idx])
+
                 prepared_batch = self.prepare_batch_logprob(
                     batch,
                     padding_length=max_context_continuation_size_allowed,
