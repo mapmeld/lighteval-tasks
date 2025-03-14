@@ -30,7 +30,7 @@ from typing import TYPE_CHECKING, Optional, Tuple, Union
 
 from lighteval.models.abstract_model import LightevalModel
 from lighteval.models.litellm_model import LiteLLMClient
-from lighteval.tasks.requests import Doc
+from lighteval.tasks.requests import Doc, GreedyUntilRequest
 from lighteval.utils.utils import as_list
 
 
@@ -238,9 +238,17 @@ class PromptManager:
             return output, num_effective_fewshots
 
         elif use_chat_template:
-            return self.model.tokenizer.apply_chat_template(
+            chat_preview = self.model.tokenizer.apply_chat_template(
                 output, tokenize=False, add_generation_prompt=True
-            ), num_effective_fewshots
+            )
+            greedyRequest = GreedyUntilRequest(
+                stop_sequence=["</think>"],
+                generation_size=10,
+                tokenized_context=chat_preview
+            )
+            response = self.model.greedy_until([greedyRequest])
+            print(response[0].result)
+            return response[0].result, num_effective_fewshots
 
         return output, num_effective_fewshots
 
