@@ -65,10 +65,10 @@ def prompt_fn_gc_eval_task(line, task_name: str = None):
 
 
 gc_eval_task = LightevalTaskConfig(
-    name="genetic-counselor-multiple-choice",
+    name="genetic-counselor-mini-demo-long",
     prompt_function=prompt_fn_gc_eval_task,
     suite=["community"],
-    hf_repo="monsoon-nlp/genetic-counselor-multiple-choice",
+    hf_repo="monsoon-nlp/genetic-counselor-mini-demo",
     hf_subset="default",
     hf_avail_splits=["evaluation"],
     evaluation_splits=["evaluation"],
