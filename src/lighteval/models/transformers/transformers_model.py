@@ -1286,10 +1286,19 @@ class TransformersModel(LightevalModel):
                 dataloader = self.accelerator.prepare(dataloader)
 
             for batch in tqdm(dataloader, disable=self.disable_tqdm, position=1):
+                filled_responses = self._generate(
+                    batch=batch,
+                    max_new_tokens=512,
+                    stop_tokens=["</think>"],
+                    num_samples=1,
+                    do_sample=False,
+                )
+                for idx, item in enumerate(batch):
+                    item.tokenized_context = filled_responses[idx]
+                    print(filled_responses[idx])
                 prepared_batch = self.prepare_batch_logprob(
                     batch, padding_length=max_context, max_context=max_context, single_token=True
                 )
-
                 out = self._model_call(prepared_batch.input_ids)  # [batch, padding_length, vocab]
                 out = F.log_softmax(out, dim=-1)  # we do a softmax over the options, no the vocab
 
